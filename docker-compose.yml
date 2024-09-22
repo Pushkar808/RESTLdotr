@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  # MongoDB Service
+  mongo:
+    image: mongo:6.0
+    container_name: mongodb
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    volumes:
+      - mongo-data:/data/db
+
+  # Node.js Service
+  nodejs:
+    build: .
+    container_name: node-app
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      # Connection string using MongoDB URL
+      MONGO_URL: mongodb://root:example@mongo:27017/mydb?authSource=admin
+    depends_on:
+      - mongo
+    volumes:
+      - ./:/usr/src/app
+      - /usr/src/app/node_modules
+
+volumes:
+  mongo-data:
